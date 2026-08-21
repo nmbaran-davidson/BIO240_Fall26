@@ -113,7 +113,7 @@ Q: Has the ratio of babies assigned boy vs. girl at birth changed over time?
 A: 
 
 
-7) Let's customize our graph of ration over time.  Here is an explanation of the arguments:
+7) Let's customize our graph of ratio over time.  Here is an explanation of the arguments:
 
 xlim=c(): set the range of the x-axis. Within the c(), list the min and max of the range separated by a comma.
 
@@ -135,4 +135,4 @@ plot(???, ???, xlim=c(1940, 2010), ylim=c(1.045, 1.06), xlab="Year", ylab="Ratio
 
 
 
-8) Let's practice turning this R markdown document into a PDF file as if you were submitting it as an assignment.  Click on the drop down arrow next to the Knit button above, which has a symbol of yarn and a knitting needle.  Select "Knit to PDF".  Note that this won't work if you have any problematic code in your R markdown document.  To check for issues, scroll up your R markdown file and make sure that you don't see any red Xs next to any of the code chunks.
+8) Let's practice turning this R markdown document into a PDF file as if you were submitting it as an assignment. Click on the drop down arrow next to the Knit button above, which has a symbol of yarn and a knitting needle.  Select "Knit to PDF".  Note that this won't work if you have any problematic code in your R markdown document.  To check for issues, scroll up your R markdown file and make sure that you don't see any red Xs next to any of the code chunks.
