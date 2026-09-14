@@ -1,0 +1,240 @@
+---
+title: "Getting to know rbinom"
+author: "SMWadgymar, NMBaran"
+date: '2022-08-16'
+output:
+  pdf_document: default
+  html_document: default
+---
+
+The goal of this activity is to familiarize yourself more with the concept of probability by simulating, visualizing, and analyzing data generated from random processes. Additionally, it is to demonstrate how R can be used to model probability and the binomial distribution.
+
+A probability distribution is a mathematical description of the possible outcomes of a random variable. There are many types of distributions that have been characterized mathematically and are useful to us when analyzing data. In our simulations above, each flip of a coin was considered a draw, and the outcome of the flip was random. Our simulations used fair coins, which have a 50% chance of coming up heads or tails. These outcomes follow a binomial distribution.  
+
+The binomial distribution is the distribution that describes the frequency of outcomes for each set of trials where there are exactly two possible outcomes for each trial (e.g. heads or tails, survives or dies, etc.).  The notation used to describe the binomial distribution, B(n,p), includes two parameters: n is the size (# flips) and p is the probability that each is heads (for now, 0.5).  A variable is binomially distributed if (1) the trials are independent, (2) the number of trials is fixed, (3) each trial outcome can be classified as success or failure, and (4) the probability of success is the same for each trial. This is one of many distributions and we will touch on a few distributions (not all by any means!) in class. 
+
+R has many built-in functions that allow us to draw samples from well-characterized distributions.  We’ll make use of three of those functions for the binomial distribution here: ‘rbinom’, ‘dbinom’, and ‘pbinom’. Importantly, we will make use of these functions to examine probabilities in two ways. First, we’ll run simulations. Simulations are digital experiments. We use them to conduct large, replicated experiments that would not be possible in real life, and as in real life, we want our outcomes to be the product of random chance. The goal is to run enough simulations that the probabilities that we estimate are likely very close approximations of the true probabilities (which are often unknown). For our second approach, we will calculate exact probabilities. We can do this because we are drawing our samples from a well-characterized distribution where the exact probabilities are known.
+
+
+
+####Getting to know the 'rbinom' function
+
+1) Let's simulate a random draw from a binomial distribution.  The rbinom function has three arguments: the number of random draws, the number of "coins" being flipped on each draw, and the probability of a heads as the outcome.  Heads will be assigned a value of 1 and tails a value of 0.
+
+```{r}
+rbinom(1, 1, 0.5)
+```
+
+Q: What does the output here mean? Hint: run the code above multiple times.
+
+A: The output was a single number, reflecting that you flipped one coin one time and it had a 50% chance of landing on heads (1) or tails (0).
+
+
+2) How would you adjust the code above to simulate ten flips of a single coin?
+
+```{r}
+rbinom(10, 1, 0.5)
+```
+
+Q: What does the output here mean?
+
+A: The output was a single set of 10 numbers, reflecting that you drew 10 coins and flipped each one once, with each having a 50% chance of landing on heads (1) or tails (0).
+
+
+3) How about one draw of ten coins?
+
+```{r}
+rbinom(1, 10, 0.5)
+```
+
+Q: What does the output here mean?
+
+A: The output was a single number, reflecting the number of times your single draw of 10 coins landed on heads (1).  To calculate the number that landed on tails, you subtract the value you get here from the total number of coins you drew in this trial.
+
+
+4) How about ten draws with each having 10 coins?
+
+```{r}
+rbinom(10, 10, 0.5)
+```
+
+Q: What does the output here mean?
+
+A: The output included ten values, possibly ranging from 0 to 10.  Each of these values reflects the number of times a single draw of 10 coins landed on heads (1).  There were ten draws of ten coins each, resulting in ten total counts in the outpout.  The results of each draw vary because the outcome of each coin flip is random.
+
+
+5) What would the outcome of 10 trials of 10 coins each be if you were using a biased coin that gave you an 80% chance of producing heads instead of a 50% chance?
+
+```{r}
+rbinom(10, 10, 0.8)
+```
+
+Q: How does the output of this line of code differ from the output you saw in the previous example that used a fair coin?  Did you expect these differences?
+
+A: The interpretation of the output is the same as in the last question, except the coins are biased towards producing a head 80% of the time instead of 50% of the time.  As a result, the total number of heads is much higher across these trails than it was with a fair coin.
+
+
+
+####Disjoint and non-disjoint outcomes
+
+6) How would you rewrite the above code to simulate the probability of rolling a 6 with a single die?
+
+```{r}
+rbinom(1, 1, 1/6)
+```
+
+7) What about the probability of rolling two ones (snake eyes!) when you roll a pair of dice 100 times? 
+
+Here you need to use the produce rule two independent events. Each event has a 1/6 probability and the events are independent.
+
+```{r}
+rbinom(100, 1, 1/6*1/6)
+rbinom(100, 2, 1/6) #Look for the #2 for two ones!
+```
+
+
+8) What about the probability of rolling a 7 or 11 (like in craps!) when you roll a pair of dice? Hint: To solve this, you need to think about the sample space.
+  
+  1:1
+  1:2
+  1:3
+  1:4
+  1:5
+  1:6 - yes (7)
+  2:1
+  2:2
+  2:3
+  2:4
+  2:5 - yes (7)
+  2:6
+  3:1
+  3:2
+  3:3
+  3:4 - yes (7)
+  3:5
+  3:6
+  4:1
+  4:2
+  4:3 - yes (7)
+  4:4
+  4:5
+  4:6
+  5:1
+  5:2 - yes (7)
+  5:3
+  5:4
+  5:5
+  5:6 - yes (11)
+  6:1 - yes (7)
+  6:2
+  6:3
+  6:4
+  6:5 - yes (11)
+  6:6
+
+```{r}
+rbinom(100, 1, 8/36)
+```
+
+####Finding probabilities through simulation
+
+9) Simulate 10000 draws each with 10 fair coins and save the outcome as 'flips'.
+
+```{r}
+flips<-rbinom(10000, 10, 0.5)
+```
+
+Q: How many values are stored in the variable called flips?  What is your interpretation of each value?
+
+A: Flips has 100000 values, and each value reflects the number of flips out of 10 that landed on heads (i.e. that equal 1).
+
+
+10) Plot a histogram of the variable called flips. This is the probability distribution.
+
+```{r}
+hist(flips)
+```
+
+Q: What is represented on the x-axis? What is represented on the y-axis? 
+
+A: The x-axis represents the different possible outcomes of 10 coin flips and the number of heads for each set of 10 flips. The y-axis is the number of each of those outcomes for 10,000 simulated flips. Note that this is an example of a binomial distribution (we'll come back to this later!)
+
+
+Q: What is the most frequent outcome? Does this make sense?
+
+A: 5 is the most common outcome. Yes, since this is a fair coin, it makes sense that on average there are 5 out of 10 flips that result in heads.
+
+
+Q: Is the probability distribution discrete or continuous? Describe the its shape. 
+
+A: Discrete. This is shaped like a bell-curve, with a peak at 5 and the probabilities tapering off to each side. However, since only integers are possible, there are not non-integer values.
+
+
+11) Let's find the fraction of draws where 5 heads occurred.
+
+```{r}
+mean(flips==5)
+```
+
+Q: Which do you expect will be lower: the probability that 3 out of 10 flips will be heads or the probability that 5 out of 10 flips will be heads?  Why?  
+
+A: With a fair coin, you would expect that half of the flips being heads would be the most common outcome.  The further you deviate from half of the flips being heads, the lower the probability of that outcome.
+
+
+12) Next, calculate the probability that 3 out of 10 flips will be heads.  This reflects the probability that this outcome will occur, and is called the density of this distribution at the point where x=3.
+
+```{r}
+mean(flips==3)
+```
+
+Q: How does the probability that 3/10 flips will be heads compare to the probability that 5/10 flips will be heads?
+
+A: It is lower, as expected.
+
+
+13) Let's find the cumulative probability that heads will occur 4 or fewer times during each draw.  This is referred to as the cumulative probability because it sums up the probability that the number of heads is 0, 1, 2, 3, or 4 out of 10 flips.
+
+```{r}
+mean(flips<=4)
+```
+
+Q: How would you adjust this line of code to estimate the cumulative probability that heads will occur 6 or more times?
+
+A:
+```{r}
+mean(flips>=4)
+```
+
+
+
+####Finding the exact probabilities
+
+14) The dbinom function estimates the *exact probability density* at a given point.  The arguments here are the density being estimated, the number of coins, and the probability of producing a head.  Note that the order and type of arguments used here do not match the order and type of arguments that you used for the 'rbinom' function.
+
+```{r}
+dbinom(5, 10, 0.5)
+dbinom(3, 10, 0.5)
+```
+
+Q: How does this command compare to the steps you took for question 11 and 12 above?  Are the estimates comparable?  Why or why not?
+
+A: The values are extremely similar and only start to differ at the thousandths decimal place.  The reason they are very slighly different is that our initial simulation had a fixed number of trials (100000) to estimate the exact probability whereas the dbinom function returns the exact probability.
+
+
+15) Now let's estimate the *cumulative probability* density for a given range.  The arguments here are the density being estimated, the number of coins, and the probability of producing a head.  Note that the order and type of arguments used here do not match the order and type of arguments that you used for the 'rbinom' function.
+
+```{r}
+pbinom(4, 10, 0.5)
+```
+
+Q: How does this command compare to the steps you took for question 13?  Are the estimates comparable?  Why or why not?
+
+A: Again, this output is extremely similar as what we saw with mean(flips<=4).  As with dbinom, pbinom returns an exact probability (in this case, a cumulative probability including all outcomes of 4 or less).
+
+
+16) Note that for above this is computing the probability of 0,1,2,3,4 heads in 10 flips. What is the cumulative probability of 5 or more heads (i.e. the probability of 5, 6, 7, 8, 9, or 10 flips)? Find the solution using *two* different approaches.
+
+```{r}
+1-pbinom(4, 10, 0.5)
+pbinom(5, 10, 0.5)
+```
