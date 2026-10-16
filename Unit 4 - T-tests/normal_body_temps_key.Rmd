@@ -1,0 +1,90 @@
+---
+title: "Normal Body Temperatures KEY"
+author: "S. Wadgymar, D. Thurtle-Schmidt, N.M. Baran"
+date: "2024-10-01"
+output: pdf_document
+---
+
+Here we are going to do an exercise to conduct a hypothesis test using the normal distribution.
+
+Mean body temperature is commonly accepted to be 98.6 degrees Fahrenheit. The origin of this benchmark value is credited to Carl Wunderlich, a scientist working in clinical thermometry in the late 19th century. A study was conducted in 1992 to evaluate whether population mean body temperature among healthy adults is really 98.6 F. Data were collected from healthy volunteers who had agreed to participate in a separate set of vaccine trials. 
+
+1) Import the thermometry file from the Unit 4 folder in RStudio on the cloud. When you import data from a .csv file, there are two important things to remember:First, set your working directory to the location of the file on the JupyterHub.Second, for your RMarkdown file to knit properly, the line that imports the data file must be included in your RMarkdown code.
+
+```{r}
+#setwd path/to/file (set the working directory to location of the Unit 4 folder)
+library(readr)
+body_temp <- read_csv("thermometry.csv", show_col_types = FALSE)
+```
+
+It is always best to first look at your data - What does the distribution look like? 
+
+```{r}
+hist(body_temp$body.temp)
+```
+
+Create and examine the qqplot for normality. Can you conclude that the plot is normal?
+
+```{r}
+qqnorm(body_temp$body.temp);qqline(body_temp$body.temp, col = 2,lwd=2,lty=2)
+```
+The qqplot indicates that the data is close to normal, but with slightly long tails (wider than usual normal distribution).
+
+Next, conduct a formal hypothesis test to evaluate if mean body temperature is really 98.6 F:
+
+1. State the hypotheses. Will the subsequent test be two-sided or one sided? Justify your choice of test. 
+
+H0: mu = 98.6
+HA: mu != 98.6
+
+A two-sided test would be appropriate because we do not have a strong expectation that body temps will be either higher or lower than 98.6, only that they could be different. 
+
+2. Manually calculate the test statistic. 
+```{r}
+#mean body temperature
+mean_bt = mean(body_temp$body.temp)
+mean_bt 
+
+#standard deviation of body temperature
+sd_bt = sd(body_temp$body.temp)
+sd_bt 
+
+#t statistic
+calc_z<-(mean_bt - 98.6)/(sd_bt/sqrt(130))
+calc_z 
+```
+
+
+3. Determine the p-value.
+
+```{r}
+pnorm(calc_z, 0, 1) * 2
+```
+
+Q: Why is it justified to use the normal distribution for this data? 
+
+A: The central limit theorem shows that the distribution of sample means is normally distributed! The sample size is large and relatively normal in shape, so we expect the CLT to hold here.
+
+4. With a significance level of 0.05, interpret the result. 
+
+A: Because p<alpha, we reject the null hypothesis that the average body temperature in humans is 98.6F.
+
+5. An alternative to a hypothesis test is to generate the 95% confidence interval for an (alpha = .05) and see if mu falls within the confidence interval. Essentially we are asking if mu close enough to the point estimate to be plausible. 
+
+First, use R to identify the Z-value (cut off value) you need to calculate a 95% confidence interval.
+```{r}
+qnorm(0.975)
+#We use qnorm because we are analyzing this data with a normal distribution.
+```
+
+Second, calculate the 95% confidence interval for the body temperature.
+
+Equation for computing confidence intervals: x +/- Z * (SE)
+```{r}
+mean_bt + (qnorm(.975) * (sd_bt/sqrt(130)))
+mean_bt - (qnorm(.975) * (sd_bt/sqrt(130)))
+```
+
+Q: Does this interval agree with the previous result? Why or Why not?
+
+A: Yes, the confidence interval excludes the null value of 98.6F suggesting that the population mean is likely different than 98.6F.  This aligns with our hypothesis test.
