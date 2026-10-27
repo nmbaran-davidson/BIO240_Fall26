@@ -1,0 +1,71 @@
+---
+title: "Fisheries ANOVA exercise"
+author: "N.M. Baran, D. Thurtle-Schmidt"
+date: "2024-10-01"
+output: pdf_document
+---
+
+
+Set your working directory and read in the fisheries data:
+
+```{r}
+fisheries <- read.csv("Hartvigsen_FishData.csv", header = TRUE)
+```
+
+Q1: Write your null and alternative hypotheses for conducting the ANOVA:
+    
+    H0: mu(low) = mu(med) = mu(high)
+    HA: At least one mean is different
+
+
+Next, we need to check our assumptions.
+
+Check for normality:
+```{r}
+boxplot(fisheries$Low, fisheries$Med, fisheries$High)
+```
+```{r}
+shapiro.test(???)
+shapiro.test(???)
+shapiro.test(???)
+```
+Check the equality of variances:
+```{r}
+???
+```
+Q2: Do our assumptions for ANOVA appear to be satisfied? Explain.
+
+
+
+
+In order to conduct our analysis, we need to prepare the data for anova. This code converts the data frame from wide to long format:
+```{r}
+fish_stack <- stack(fisheries) #Converts wide to long format
+names(fish_stack) <- c("Mass", "Treatment") #renames variables
+```
+Q3: How did this code change/reshape the data frame? (Note that getting your data into the right format is one of the harder/more annoying parts of stats!)
+
+
+
+```{r}
+fish.aov <- aov(???) #Runs the anova and stores it as an object
+fish.aov #Provides only sum of squares, residuals, and dfs...
+summary(fish.aov) #Provides more details, including F-value and p-value!
+```
+
+Showing that the F value is the *ratio of the mean squares* and that using the F-distribution you can find the p-value with the degrees of freedom indicated.
+```{r}
+245.03/16.84
+1-pf(14.55, 2, 15) #Here we're using the F-distribution!
+```
+Q4: Interpret the result of this ANOVA. Do we reject or fail to reject our null hypothesis?
+
+
+
+
+We're not done yet! We don't know which group(s) are different from the others. Thus, we need to perform a posthoc analysis:
+```{r}
+TukeyHSD(fish.aov) #note that you input the anova object that you created above!
+```
+
+Q5: Which pairwise comparisons are statistically significant?
