@@ -1,0 +1,146 @@
+---
+title: "Correlation_Regression"
+author: "D. Thurtle-schmidt, N.M. Baran"
+date: "10/22/2024"
+output:
+  pdf_document:
+    latex_engine: xelatex
+---
+
+```{r}
+install.packages("tinytex") # this only needs to run once
+```
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Learning Objectives for this exercise:
+
+•	Plot numerical data in R using a scatter plot with titles, axes labels, and other customization
+•	Find the correlation coefficient (r) in R
+•	Conduct a hypothesis test to determine if two numerical variables are correlated
+•	Fit a linear model to data in R 
+•	Write the hypotheses of a linear regression 
+•	Determine the equation that describes the relationship, the significance of the statistical test, and how well the points fit the model (R2) from the linear model determined using R.
+•	Add the line representing the linear model to a scatter plot in R
+•	Apply the linear model to predict the value of the response variable from a given explanatory variable with a 95% confidence interval.
+
+About the dataset for this exercise:
+
+By 1970, the wolf (/Canis lupus/) had been wiped out in Norway and Sweden. Around 1980, two wolves immigrated from farther east and founded a new population. By 2002, the new population totaled approximately 100 wolves. A new population started by so few individuals, however, might be expected to suffer problems caused by inbreeding (two genetically related individuals mating). Liberg et al. (2005) complied observations on reproduction between 1983 and 2002 and constructed a pedigree of the wolves in the small population. The data lists the inbreeding coefficients of litters produced by mated pairs and the number of pups of each litter surviving their first winter, which is a measure of fitness of the offspring. An inbreeding coefficient is zero if parents of the litter were unrelated, .25 if parents were brother and sister whose own parents were unrelated, and greater than .25 if inbreeding had continued for more generations. Scientists were interested if the inbreeding coefficient and the fitness, measured by the number of pups surviving the first winter, were associated. 
+
+First, read in the dataset:
+```{r}
+wolf <- read.csv(url("http://www.zoology.ubc.ca/~schluter/WhitlockSchluter/wp-content/data/chapter16/chap16e2InbreedingWolves.csv"))
+```
+
+Correlation:
+To start, we will learn to plot data in R and find the correlation coefficient and test if this correlation coefficient is significant through a hypothesis test. 
+
+With two numerical variables, a good first question to start with is “are these variables correlated?” To start, we always want to first look at our data. A scatterplot is the best way to visualize two numerical variables. For a basic scatterplot in R, use the plot() function.
+
+```{r}
+plot(wolf$nPups~wolf$inbreedCoef)
+```
+
+This is a very basic scatterplot. Notice how the two datasets were entered and which ended up on the Y-axis and which ended up on the X-axis. In this case, our explanatory variable is the inbreeding coefficient and the number of pups surviving winter is the response variable. I remember which way it will show up by reading the “~” (tilde) as “depends on.” Thus, here we are plotting the number of wolf pups which “depends on” the inbreeding
+coefficient. 
+
+Question 1: This is a pretty basic plot. Look at the help documentation for plot() and determine how to add the following to your plot:
+1.)	X-axis label
+2.)	Y-axis label
+3.)	Blue filled in circles (to determine how to set the point to filled in, google “pch in R” and look for the answer).
+
+Question 2: Look at the graph. Does it look like there is a correlation? Describe the relationship between the two variables. Make sure to discuss form, direction, and strength of the relationship as well as any unusual observations.
+
+
+
+
+Since it looks like there may be a correlation, lets test this hypothesis. First, we must write out our hypotheses. Remember that the correlation coefficient for a sample is denoted by r, and for the population is denoted by rho (ρ). Our null hypothesis is that there is no correlation and our alternative hypothesis is that there is a correlation. 
+
+
+Question 3: Write, in statistical notation, the hypotheses to test this correlation.
+
+
+
+There is a function in R to test for a correlation and find the correlation coefficient:
+
+```{r}
+cor.test(wolf$nPups, wolf$inbreedCoef)
+```
+
+Question 4: Identify the returned p-value and r, correlation coefficient. Interpret the results in the context of the data. What would happen if you inputted the data in reverse order (i.e. the inbreeding coefficient first, followed by the number of pups). Why or why not? Test and check your answer by doing this. 
+
+Linear regression:
+Now that we have established that there is a correlation, let’s try and model this correlation so that we can make predictions. 
+
+First, we need to start by checking baseline assumptions before fitting a linear model. A linear model depends on: 
+1) Linearity
+2) Normal (or nearly normal residuals)
+3) Constant variance
+
+Question 5: Determine if the the relationship between the explanatory and response variable is linear.
+
+
+Question 6: Check if the condition of normal (or nearly normal) residuals is satisfied.
+
+```{r}
+wolf.lm <- lm(nPups~inbreedCoef, data = wolf)
+residuals<-wolf.lm$residuals #This pulls the residuals out of my model and puts them in a vector list. 
+
+hist(residuals)
+qqnorm(residuals)
+shapiro.test(residuals)
+```
+
+Question 7: Check if the condition of constant variability (i.e. homoscedasticity) is satisfied. 
+```{r}
+# produce residual vs. fitted plot 
+plot(fitted(wolf.lm), residuals)
+  
+# add a horizontal line at 0  
+abline(0,0) 
+```
+
+Once these conditions are satisfied, we can proceed with our linear regression. To construct the linear model, use the function lm() in R. We give the names of the two variables, and then tell R where to find the dataframe with the data = option. This model should be saved to a variable (like in anova) and then we can look at the results using the summary() function.
+
+```{r}
+wolf.lm <- lm(nPups~inbreedCoef, data = wolf) #Note, this was also shown above!
+summary(wolf.lm)
+```
+
+Question 8: Look at the summary of the linear model and identify then interpret the following values:
+	a) The intercept
+	b) The slope
+	c) Write the model in y = β0+ β1x notation.
+	d) The R2 value. How does this relate to the correlation coefficient found previously?
+
+Looking closely at the output of the linear model, you may have noticed there are some p-values there. That means a hypothesis test was conducted! In this case it was not any hypothesis test, but a t-test (notice the t-value given). This is why we had to check for normality of the response variable! For the first p-value (in the intercept row) a hypothesis test was conducted to test if the intercept is significant different from 0 (H0: β0=0, HA: β0≠0). The hypothesis test that is likely of more interest is the second p-value, which tested is the slope of the regression line is zero or not (H0: β1=0, HA: β1≠0). 
+
+Question 9: Interpret the p-values given for these hypothesis tests in the context of the data. Additionally, given the correlation found earlier, would you have expected the hypothesis test of the slope to fail to reject or reject the null hypothesis?
+
+Now that we have the linear model and have checked all assumptions, we may want to add this line to our original scatterplot. We can do this with abline() and calling the linear model.
+
+```{r}
+plot(wolf$nPups~wolf$inbreedCoef, xlab = "Inbreeding Coefficient", ylab = "Number of Pups", col = "blue", pch = 16)
+abline(wolf.lm)
+```
+
+Lastly, we make want to make a prediction of the response variable based on the linear model for a given value of our explanatory variable. As with any good prediction we should have some uncertainty associated with this prediction. Thus, we can add the term “confidence” to the interval option of the predict() function to not only give the prediction, but the lower and upper bounds of the 95% confidence interval:
+
+```{r}
+predict(wolf.lm, data.frame(inbreedCoef = 0.250), interval = "confidence")
+```
+
+Question 9: Interpret the output of the line of code above in the context of the data. Then, determine how many pups would you expect for an inbreeding coefficient of .2.
+
+
+```{r}
+predict(wolf.lm, data.frame(inbreedCoef = 0.25), interval = "confidence")
+```
+
+Question 10: Your lab mate suggests that you should predict the number of pups for an inbreeding coefficient of .5. You say that this in not advisable for your model. Explain why this is not advisable for the model you have developed.
+
+

@@ -1,0 +1,188 @@
+---
+title: "Nonparametric tests"
+author: "N.M. Baran"
+date: "2024-10-05"
+output: pdf_document
+---
+
+Let's revisit some of our previous datasets and re-run the analyses using non parametric statistics!
+
+We will use the nhanes.samp.adult dataset, which we used to look at number of hours of sleep previously (its also a dataset that is an option for your final projects!)
+
+First, install the R package where a bunch of datasets associated with the textbook are available. Run the following code. Follow any prompts to keep the install proceeding. Note that this only needs to be installed once *ever* in your JupyterHub, not everytime you run your code.
+
+```{r}
+#install.packages("devtools")
+#devtools::install_github("OI-Biostat/oi_biostat_data")
+```
+
+Now load the data:
+```{r}
+library(oibiostat) #the library function needs to be included any time you load a package into your workspace
+data("nhanes.samp.adult")
+```
+
+We are interested in whether there is a gender differences in urine flow (i.e. a difference between men and women in this dataset).
+
+Q: Generate a graph and test whether the conditions are met to perform a t-test to examine whether UrineFlow is different between men and women.  
+
+```{r}
+???
+```
+
+Q: Are we okay to proceed with a t-test here? Describe the distribution. Is there extreme skew to the data? 
+
+A: ???
+
+
+Let's see if the data can be transformed to be normal. 
+The most common transformations for right skewed data is a log transformation. 
+The most common transformation for right-skewed data is a square of the data. 
+
+Q: Attempt the transformation:
+
+```{r}
+???(log(nhanes.samp.adult$UrineFlow1))
+```
+
+Q:Did that help? Do the data now look appropriate for proceeding with our t-test? Hint: You can also check the results with a Shapiro-Wilks test. 
+
+A: ???
+
+```{r}
+???
+```
+
+Okay, if the assumptions are met using our transformed data, then we are good to proceed with our analyses *using the transformed data*. Conduct your hypothesis test to assess whether there is a difference in urine flow between men and women. 
+
+
+(a) Formulate null and alternative hypotheses
+
+A: ???
+
+(b) Specify a significance level, alpha
+
+A: ???
+
+(c) Conduct the t-test:
+
+```{r}
+???
+```
+
+(d): Interpret the p-value in the context of the alpha value.
+
+A: ???
+
+##############################
+
+Alright, let's try another variable...
+
+Let's test if there is a difference in the concentration of the steroid hormone testosterone between men and women. 
+
+Q: Generate a graph to test whether the conditions are met to perform a t-test to examine whether testosterone is different between men and women.  
+
+```{r}
+???
+```
+
+Q: Are we okay to proceed with a t-test here? Is there extreme skew to the data? Describe the distribution. 
+
+A: ???
+
+Q: Let's see if the data can be transformed to be normal. Attempt the transformation:
+
+```{r}
+???
+```
+
+Q: Did that help? Do the data now look appropriate for proceeding with our t-test? Hint: You can also check the results with a Shapiro-Wilks test. 
+
+```{r}
+???
+```
+A: ???
+
+
+Okay, so its looking like this data cannot be transformed to be normal. We may need to use a non-parametric test. 
+
+Q: What is the appropriate non-parametric test for this? 
+
+A: ???
+
+(a) Formulate null and alternative hypotheses
+
+A: ???
+
+(b) Specify a significance level, alpha
+
+A: ???
+
+```{r}
+wilcox.test(???)
+```
+Note that the Wilcoxon rank sum test gives us a new test statistic (W) and provides us a p-value!
+
+(c): Interpret the p-value in the context of the alpha value.
+
+A: ???
+
+############################
+
+What about ANOVAs?
+
+Let's ask a new question. Does a person's Education affect their mental health? In this case, we'll use as our dependent variable DaysMentHlthBad. The independent variable will be Education, which is a categorical, ordinal variable representing different levels of educational attainment. See below.
+
+```{r}
+summary(nhanes.samp.adult$Education)
+```
+
+Q: As above, let's generate a to test whether our conditions are met (note: we would normally check other conditions, but for now lets focus on the issue of normality). 
+
+```{r}
+???
+```
+
+Q: Since this is right-skewed, can it be log transformed?
+
+```{r}
+???
+```
+A: ???
+
+This is a good candidate for a nonparametric alternative to the ANOVA, the Kruskal-Wallis test. 
+
+```{r}
+kruskal.test(???)
+```
+Note that this gives us a chi-square statistic, with a df = 4. 
+
+Q: Where does the degrees of freedom come from in this case?
+
+A: ???
+
+Q: Interpret the p-value in the context of the alpha value.
+
+A: Since p>0.05, we fail to reject the null hypothesis. No group is different from any other group. 
+
+#########################
+
+FOR YOUR INFORMATION ONLY:
+The most common posthoc test for the Kruskal-Wallis test is the Dunn test. To use this in R, we need to install the FSA package. 
+
+```{r}
+install.packages("FSA")
+#Note: this only needs to be run once in your instance of R. 
+```
+
+Load the package into R:
+```{r}
+library(FSA)
+```
+Ok, let's try the Dunn's test with the Benjamin
+```{r}
+dunnTest(nhanes.samp.adult$DaysMentHlthBad~nhanes.samp.adult$Education,
+              method="bh")
+```
+
+
