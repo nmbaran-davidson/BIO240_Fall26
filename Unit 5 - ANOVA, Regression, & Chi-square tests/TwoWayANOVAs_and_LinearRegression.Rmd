@@ -1,0 +1,99 @@
+---
+title: "TwoWayANOVAs_and_LinearRegression"
+author: "N.M. Baran"
+date: "2025-11-10"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This lab uses data from the Prevention of REnal and Vascular END-stage Disease (PREVEND) study. Clinical and demographic data for 4,095 individuals are stored in the PREVEND dataset in the oibiostat package. 
+
+```{r}
+library(oibiostat)
+data(prevend.samp)
+```
+
+If the above code doesn't work, you need to install the oibiostat package using the following commands (minus the #)
+```{r}
+#install.packages("devtools")
+#devtools::install_github("OI-Biostat/oi_biostat_data")
+```
+
+Suppose we are interested in whether there is difference in the effect of a history of a cardiovascular event depending on gender on the RFFT score, i.e is there an interaction between gender and cardiovascular event.
+
+Let's first look at how the results of a t-test, ANOVA, and linear regression compare for the effect of gender on RFFT score.
+
+```{r}
+t.test(XXX~XXX, var.equal=TRUE) #Needs the var.equal=TRUE to give the results of a student t-test (the default is Welch's t-test, whcih adjusts the degrees of freedom when calculating the degrees of freedom)
+
+
+model.RFFTvsGenderaov = aov(XXX~XXX)
+summary(model.RFFTvsGenderaov)
+
+model.RFFTvsGender = lm(XXX~XXX)
+summary(model.RFFTvsGender)
+```
+
+Q: Does the p-value computed for the effect of gender differ between the different models?      
+
+A: 
+
+Q: Does the F-statistic computed for the effect of gender in the ANOVA differ from the F-statistic computed for the overall model in the linear regression?
+
+A: 
+
+Q: What are some advantages of the linear regression model over the t-test and the ANOVA?
+
+A: 
+
+
+Ok, let's move on to the more complex model... Write the linear model that tests for an interaction between the effect of Gender and the effect of a previous cardiovascular event (CVD) on RFFT score.
+
+A: 
+
+Ok, let's relabel the variables to help label our data.
+
+```{r}
+prevend.samp$Gender <- factor(prevend.samp$Gender, levels = c(0,1), labels = c("Males", "Females") )
+prevend.samp$CVD <- factor(prevend.samp$CVD, levels = c(0,1), labels = c("No", "Yes") )
+```
+
+Alright, let's run the model:
+```{r}
+model.RFFTvsGenderCVD = lm(XXX~XXX * XXX)
+summary(model.RFFTvsGenderCVD)
+```
+
+
+
+a) Write the overall equation of the linear model. 
+
+
+
+b) Now write the two (separate!) equations for males and females separately. Assume, as in the linear model, that Gender is 0 for males and 1 for females. 
+
+Males: 
+Females: 
+
+c) How do these results compare to the output of the interaction plot below?
+
+```{r}
+interaction.plot(x.factor = prevend.samp$CVD, 
+                 trace.factor = prevend.samp$Gender,
+                 response = prevend.samp$RFFT)
+```
+
+
+
+d) Interpretation of intercept:
+
+e) Interpretation of slope for Gender:
+
+f) Interpretation of slope for CVD:
+
+e) Interpretation of slope for Gender*CVD interaction:
+
+f) Interpretation of R2: 
