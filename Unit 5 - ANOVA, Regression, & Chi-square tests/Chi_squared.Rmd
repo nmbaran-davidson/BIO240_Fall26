@@ -1,0 +1,126 @@
+---
+title: "Chi-square Goodness of Fit"
+author: "N.M. Baran"
+date: "2024-11-11"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Let's consider the dice example...
+
+##Enter the data
+```{r}
+dice_obs <- c(53222, 52118, 52465, 52338, 52244, 53285)
+exp = 52612/315672
+dice_exp <- c(exp, exp, exp, exp, exp, exp) 
+```
+##Note that expected values MUST be probabilities that sum up to 1
+
+
+##Run the test
+```{r}
+chisq.test(dice_obs, p = dice_exp)
+```
+
+##If you want to extract the expected values that R calculated:
+```{r}
+names(chisq.test(dice_obs, p = dice_exp))
+dice_exp_values <- chisq.test(dice_obs, p = dice_exp)$expected
+```
+
+##Graph this data:
+```{r}
+barplot(dice_obs, ylim = c(50000, 56000), xpd = FALSE, names=c(1:6), ylab="Number of occurances", xlab="Face of the die") 
+
+#xpd=F keeps bars from running off the graph
+
+abline(h = 52612, lty = 3) #A horizontal line showing the expected values
+```
+
+############################
+##Test of independence - Popular kids
+
+In the dataset popular, students in grades 4-6 were asked whether good grades, athletic ability, or popularity was most important to them. A two-way table separating the students by grade and by choice of most important factor is shown below. Do these data provide evidence to suggest that goals vary by grade?
+
+##For contingency tables, we need to first create a matrix, then give that to the chi-squared test. Additionally, matrices are well-suited for making barplots of the data:
+
+##Make a matrix (the byrow=T argument means you are entering values from left to right)
+```{r}
+popular <- matrix(c(63, 31, 25, 88, 55, 33, 96, 55, 32), byrow = TRUE, nrow = 3,
+                  dimnames = list(
+    Category = c("4th", "5th", "6th"),
+    Grade    = c("Grades", "Popular", "Sports")
+  )
+)
+
+#names = c("Grades", "Popular", "Sports"), legend = c("4th", "5th", "6th"),
+```
+
+Question 1: What are your hypotheses?
+
+Question 2: Check the conditions for the test. Are the conditions met?
+
+##Run the test
+```{r}
+chisq.test(popular)
+```
+Question 3: Interpret your result in the context of the dataset. 
+
+
+##Graph the result (the beside=T argument keeps the bars next to each other instead of stacked)
+##Note that values will be grouped by the column variable and the legend will represent the row variable
+
+```{r}
+barplot(popular, beside = TRUE)
+
+#, names = c("Grades", "Popular", "Sports"), legend = c("4th", "5th", "6th"), ylim = c(0,100))
+```
+
+
+```{r}
+props <- prop.table(popular, margin = 2)
+
+barplot(popular,horiz = FALSE,
+        ylab = "Number", 
+        xlab = "Category",
+        legend.text = rownames(popular), 
+        args.legend = list(x = "topright", inset = c(-0.02, 0), bty = "n"))
+
+barplot(props,horiz = FALSE, 
+        ylab = "Proportion", 
+        xlab = "Category",
+        legend.text = rownames(props), 
+        args.legend = list(x = "topright", inset = c(-0.08, 0), bty = "n"))
+```
+########################################
+
+Let's try it with data from a data frame. Import the Prevend dataset again:
+```{r}
+library(oibiostat)
+data(prevend.samp)
+```
+
+Let's consider whether there is association between gender and smoking.
+
+Question 1: What are your hypotheses?
+
+Question 2: Check the conditions for the test. Are the conditions met?
+
+#Run the test
+```{r}
+chisq.test(prevend.samp$Gender,prevend.samp$Smoking)
+```
+# Let's make a graph. Add the elements to these graphs to include labels, legend, etc. 
+```{r}
+tab <- table(prevend.samp$Gender,prevend.samp$Smoking)
+props2 <- prop.table(tab, margin = 2)
+
+barplot(tab,horiz = FALSE, ###)
+barplot(props2,horiz = FALSE, ###)
+```
+
+
+
